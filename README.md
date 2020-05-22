@@ -1,6 +1,6 @@
 # mcp
 Copy multiple files using your `$EDITOR`.
-This is inspired by [mmv](http://github.com/itchyny/mmv/cmd/mmv)
+This is inspired by [mmv](http://github.com/itchyny/mmv)
 
 ## Usage
 ```sh
