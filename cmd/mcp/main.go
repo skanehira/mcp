@@ -16,13 +16,6 @@ const (
 	exitCodeErr
 )
 
-func init() {
-	flag.Parse()
-	flag.Usage = func() {
-		fmt.Print(`usage: mc file ...`)
-	}
-}
-
 func main() {
 	os.Exit(run())
 }
@@ -32,9 +25,28 @@ func printError(err error) {
 }
 
 func run() int {
-	args := flag.Args()
+	name := "mcp"
+	fs := flag.NewFlagSet(name, flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	fs.Usage = func() {
+		fs.SetOutput(os.Stdout)
+		fmt.Printf(`%[1]s - copy multiple files with editor
+
+Usage:
+  $ %[1]s file ...
+`, name)
+	}
+
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		if err == flag.ErrHelp {
+			return exitCodeOK
+		}
+		return exitCodeErr
+	}
+
+	args := fs.Args()
 	if len(args) == 0 {
-		flag.Usage()
+		fs.Usage()
 		return exitCodeErr
 	}
 
