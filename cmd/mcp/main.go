@@ -16,6 +16,10 @@ const (
 	exitCodeErr
 )
 
+var (
+	stdout io.Writer = os.Stdout
+)
+
 func main() {
 	name := "mcp"
 	fs := flag.NewFlagSet(name, flag.ContinueOnError)
@@ -191,7 +195,7 @@ func fcopy(src, dest string, info os.FileInfo) error {
 	}
 	defer s.Close()
 
-	fmt.Printf("copy %s to %s\n", src, dest)
+	fmt.Fprintf(stdout, "copy %s to %s\n", src, dest)
 	if _, err := io.Copy(out, s); err != nil {
 		return err
 	}
@@ -206,7 +210,7 @@ func link(src, dest string) error {
 		return err
 	}
 
-	fmt.Printf("copy %s to %s\n", src, dest)
+	fmt.Fprintf(stdout, "copy %s to %s\n", src, dest)
 	src, err := os.Readlink(src)
 	if err != nil {
 		return err
