@@ -50,7 +50,7 @@ Usage:
 
 func run(args []string) error {
 	for _, arg := range args {
-		if _, err := os.Stat(arg); err != nil {
+		if _, err := os.Lstat(arg); err != nil {
 			return err
 		}
 	}
@@ -122,7 +122,7 @@ func mcp(sources, dests []string) error {
 			continue
 		}
 
-		info, err := os.Stat(s)
+		info, err := os.Lstat(s)
 		if err != nil {
 			return err
 		}
@@ -136,7 +136,7 @@ func mcp(sources, dests []string) error {
 }
 
 func copy(src, dest string, info os.FileInfo) error {
-	if info.Mode()&os.ModeSymlink != 0 {
+	if info.Mode()&os.ModeSymlink == os.ModeSymlink {
 		return link(src, dest)
 	}
 	if info.IsDir() {
@@ -199,6 +199,14 @@ func fcopy(src, dest string, info os.FileInfo) error {
 }
 
 func link(src, dest string) error {
+	if src == filepath.Dir(dest) {
+		return fmt.Errorf("%s and %s is same parent directory", src, dest)
+	}
+	if err := os.MkdirAll(filepath.Dir(dest), 0775); err != nil {
+		return err
+	}
+
+	fmt.Printf("copy %s to %s\n", src, dest)
 	src, err := os.Readlink(src)
 	if err != nil {
 		return err
