@@ -137,6 +137,9 @@ func copy(src, dest string, info os.FileInfo) error {
 }
 
 func dcopy(srcDir, destDir string, info os.FileInfo) error {
+	if srcDir == filepath.Dir(destDir) {
+		return fmt.Errorf("%s and %s is same parent directory", srcDir, destDir)
+	}
 	if err := os.MkdirAll(destDir, 0775); err != nil {
 		return err
 	}
