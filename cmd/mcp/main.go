@@ -17,14 +17,6 @@ const (
 )
 
 func main() {
-	os.Exit(run())
-}
-
-func printError(err error) {
-	fmt.Fprintln(os.Stderr, err)
-}
-
-func run() int {
 	name := "mcp"
 	fs := flag.NewFlagSet(name, flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -39,33 +31,30 @@ Usage:
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		if err == flag.ErrHelp {
-			return exitCodeOK
+			return
 		}
-		return exitCodeErr
+		os.Exit(exitCodeErr)
 	}
 
 	args := fs.Args()
 	if len(args) == 0 {
 		fs.Usage()
-		return exitCodeErr
+		return
 	}
 
+	if err := run(args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(exitCodeErr)
+	}
+}
+
+func run(args []string) error {
 	for _, arg := range args {
 		if _, err := os.Stat(arg); err != nil {
-			printError(err)
-			return exitCodeErr
+			return err
 		}
 	}
 
-	if err := mcp(args); err != nil {
-		printError(err)
-		return exitCodeErr
-	}
-
-	return exitCodeOK
-}
-
-func mcp(args []string) error {
 	existed := make(map[string]bool, len(args))
 	for _, arg := range args {
 		if existed[arg] {
@@ -119,6 +108,14 @@ func mcp(args []string) error {
 		sources = args
 	}
 
+	if err := mcp(sources, dests); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func mcp(sources, dests []string) error {
 	for i, s := range sources {
 		d := dests[i]
 		if d == "" || s == d {
