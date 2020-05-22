@@ -96,7 +96,7 @@ func mcp(args []string) error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("abort copy: %s", err)
+		return fmt.Errorf("abort copy files")
 	}
 
 	b, err := ioutil.ReadFile(f.Name())
