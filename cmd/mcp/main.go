@@ -16,6 +16,8 @@ const (
 	exitCodeErr
 )
 
+var version = "1.0.0"
+
 var (
 	stdout io.Writer = os.Stdout
 )
@@ -28,9 +30,11 @@ func main() {
 		fs.SetOutput(os.Stdout)
 		fmt.Printf(`%[1]s - copy multiple files with editor
 
+Version: %s
+
 Usage:
   $ %[1]s file ...
-`, name)
+`, name, version)
 	}
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
